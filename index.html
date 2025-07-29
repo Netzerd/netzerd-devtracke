@@ -419,5 +419,77 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
     <script src="app.js"></script>
+    <!-- User Modal -->
+<div id="userModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="userModalTitle">Nuevo Usuario</h2>
+            <button class="close-modal" onclick="closeUserModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="userForm" class="modal-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nombre completo</label>
+                    <input type="text" id="userName" required>
+                </div>
+                <div class="form-group">
+                    <label>Correo electrónico</label>
+                    <input type="email" id="userEmail" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="userPassword" required>
+                </div>
+                <div class="form-group">
+                    <label>Rol</label>
+                    <select id="userRole" required>
+                        <option value="">Seleccionar rol</option>
+                        <option value="Administrator">Administrador</option>
+                        <option value="Senior Backend Developer">Backend Senior</option>
+                        <option value="Full Stack Developer">Full Stack</option>
+                        <option value="Frontend Developer">Frontend</option>
+                        <option value="Mobile Developer">Mobile Developer</option>
+                        <option value="DevOps Engineer">DevOps</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Habilidades (separadas por comas)</label>
+                <input type="text" id="userSkills" placeholder="JavaScript, Node.js, React...">
+            </div>
+            
+            <div class="form-group">
+                <label>Permisos</label>
+                <div class="permissions-checkboxes">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="permCreate" checked> Crear tareas
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="permEdit" checked> Editar tareas
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="permDelete"> Eliminar tareas
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="permAdmin"> Acceso administrador
+                    </label>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" onclick="closeUserModal()">Cancelar</button>
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i> Guardar Usuario
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 </body>
 </html>

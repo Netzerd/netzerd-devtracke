@@ -87,24 +87,250 @@ function handleLogin() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
     
-    // Simulación de autenticación
-    // En producción, esto sería una llamada a API
-    if (email && password) {
-        const user = {
-            id: generateId(),
-            email: email,
-            name: email.split('@')[0],
-            role: 'Senior Developer',
-            avatar: `https://ui-avatars.com/api/?name=${email.split('@')[0]}&background=0D8ABC&color=fff`,
-            permissions: ['create', 'edit', 'delete', 'admin']
-        };
-        
+    // Usuarios predefinidos (en un sistema real, esto vendría de una base de datos)
+    const predefinedUsers = [
+        {
+            id: 'admin-001',
+            email: 'admin@netzerd.com',
+            password: 'admin123', // En producción usar contraseñas hasheadas
+            name: 'Administrador',
+            role: 'Administrator',
+            avatar: 'https://ui-avatars.com/api/?name=Admin&background=ef4444&color=fff',
+            permissions: ['create', 'edit', 'delete', 'admin', 'manage_users'],
+            isAdmin: true
+        },
+        {
+            id: 'team-1',
+            email: 'carlos@netzerd.com',
+            password: 'password123',
+            name: 'Carlos Rodríguez',
+            role: 'Senior Backend Developer',
+            avatar: 'https://ui-avatars.com/api/?name=Carlos+Rodriguez&background=2563eb&color=fff',
+            permissions: ['create', 'edit'],
+            isAdmin: false
+        },
+        {
+            id: 'team-2',
+            email: 'ana@netzerd.com',
+            password: 'password123',
+            name: 'Ana García',
+            role: 'Full Stack Developer',
+            avatar: 'https://ui-avatars.com/api/?name=Ana+Garcia&background=22c55e&color=fff',
+            permissions: ['create', 'edit'],
+            isAdmin: false
+        }
+        // Puedes añadir más usuarios predefinidos aquí
+    ];
+    
+    // Buscar usuario
+    const user = predefinedUsers.find(u => u.email === email && u.password === password);
+    
+    if (user) {
         appState.currentUser = user;
         localStorage.setItem(APP_CONFIG.storage_prefix + 'session', JSON.stringify(user));
         
         showDashboard();
         createNotification('Bienvenido', `Has iniciado sesión correctamente como ${user.name}`, 'success');
+        
+        // Cargar información basada en el rol
+        if (user.isAdmin) {
+            showAdminFeatures();
+        } else {
+            hideAdminFeatures();
+        }
+    } else {
+        alert('Usuario o contraseña incorrectos. Inténtalo de nuevo.');
     }
+}
+
+function showAdminFeatures() {
+    // Mostrar elementos solo para administradores
+    document.querySelectorAll('.admin-only').forEach(el => {
+        el.style.display = 'flex';
+    });
+    
+    // Añadir sección de administración al menú
+    const sidebar = document.querySelector('.sidebar-nav');
+    
+    // Verificar si ya existe para no duplicar
+    if (!document.querySelector('[data-section="admin"]')) {
+        const adminLink = document.createElement('a');
+        adminLink.href = "#";
+        adminLink.className = 'nav-item';
+        adminLink.dataset.section = 'admin';
+        adminLink.innerHTML = '<i class="fas fa-user-shield"></i> Administración';
+        
+        adminLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            navigateToSection('admin');
+        });
+        
+        sidebar.appendChild(adminLink);
+    }
+    
+    // Crear sección de administración si no existe
+    if (!document.getElementById('adminSection')) {
+        createAdminSection();
+    }
+}
+
+function hideAdminFeatures() {
+    // Ocultar elementos solo para administradores
+    document.querySelectorAll('.admin-only').forEach(el => {
+        el.style.display = 'none';
+    });
+    
+    // Eliminar sección de administración del menú si existe
+    const adminLink = document.querySelector('[data-section="admin"]');
+    if (adminLink) {
+        adminLink.remove();
+    }
+}
+
+function createAdminSection() {
+    // Crear sección de administración
+    const mainContent = document.querySelector('.main-content');
+    
+    const adminSection = document.createElement('section');
+    adminSection.id = 'adminSection';
+    adminSection.className = 'content-section';
+    
+    adminSection.innerHTML = `
+        <div class="section-header">
+            <h1>Panel de Administración</h1>
+            <div class="header-actions">
+                <button class="btn-primary" onclick="showNewUserModal()">
+                    <i class="fas fa-user-plus"></i> Nuevo Usuario
+                </button>
+                <button class="btn-secondary" onclick="exportUserData()">
+                    <i class="fas fa-download"></i> Exportar Usuarios
+                </button>
+            </div>
+        </div>
+        
+        <div class="admin-tabs">
+            <button class="tab-btn active" data-tab="users">Gestión de Usuarios</button>
+            <button class="tab-btn" data-tab="permissions">Roles y Permisos</button>
+            <button class="tab-btn" data-tab="activity">Registro de Actividad</button>
+        </div>
+        
+        <div class="tab-content active" id="usersTab">
+            <div class="search-bar">
+                <input type="search" id="searchUsers" placeholder="Buscar usuarios..." class="search-input">
+                <select id="filterRole" class="filter-select">
+                    <option value="">Todos los roles</option>
+                    <option value="Administrator">Administrador</option>
+                    <option value="Senior Backend Developer">Backend Senior</option>
+                    <option value="Full Stack Developer">Full Stack</option>
+                    <option value="Frontend Developer">Frontend</option>
+                </select>
+            </div>
+            
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Tareas</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <!-- Usuarios se cargarán dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="tab-content" id="permissionsTab">
+            <div class="roles-container">
+                <div class="role-card">
+                    <h3>Administrador</h3>
+                    <p>Acceso completo al sistema</p>
+                    <ul class="permissions-list">
+                        <li><i class="fas fa-check"></i> Crear/editar/eliminar tareas</li>
+                        <li><i class="fas fa-check"></i> Gestionar usuarios</li>
+                        <li><i class="fas fa-check"></i> Gestionar proyectos</li>
+                        <li><i class="fas fa-check"></i> Ver reportes</li>
+                        <li><i class="fas fa-check"></i> Configuración del sistema</li>
+                    </ul>
+                    <button class="btn-secondary">Editar rol</button>
+                </div>
+                
+                <div class="role-card">
+                    <h3>Desarrollador</h3>
+                    <p>Acceso limitado al sistema</p>
+                    <ul class="permissions-list">
+                        <li><i class="fas fa-check"></i> Ver tareas asignadas</li>
+                        <li><i class="fas fa-check"></i> Actualizar progreso</li>
+                        <li><i class="fas fa-check"></i> Añadir comentarios</li>
+                        <li><i class="fas fa-times"></i> Gestionar usuarios</li>
+                        <li><i class="fas fa-times"></i> Configuración del sistema</li>
+                    </ul>
+                    <button class="btn-secondary">Editar rol</button>
+                </div>
+                
+                <div class="role-card add-role">
+                    <div class="add-role-content">
+                        <i class="fas fa-plus-circle"></i>
+                        <h3>Añadir nuevo rol</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="activityTab">
+            <div class="activity-filters">
+                <select id="filterActivityType" class="filter-select">
+                    <option value="">Todos los tipos</option>
+                    <option value="login">Inicios de sesión</option>
+                    <option value="user">Gestión de usuarios</option>
+                    <option value="task">Gestión de tareas</option>
+                </select>
+                <input type="date" id="activityStartDate" class="date-input">
+                <input type="date" id="activityEndDate" class="date-input">
+                <button class="btn-primary" onclick="filterActivityLog()">Filtrar</button>
+            </div>
+            
+            <div class="activity-log-container">
+                <table class="activity-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha/Hora</th>
+                            <th>Usuario</th>
+                            <th>Acción</th>
+                            <th>Detalles</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activityLogTableBody">
+                        <!-- Actividad se cargará dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+    
+    mainContent.appendChild(adminSection);
+    
+    // Añadir event listeners para las pestañas
+    adminSection.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Desactivar todas las pestañas
+            adminSection.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            adminSection.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Activar la pestaña seleccionada
+            btn.classList.add('active');
+            document.getElementById(btn.dataset.tab + 'Tab').classList.add('active');
+        });
+    });
+    
+    // Cargar usuarios en la tabla
+    loadUsersTable();
+    
+    // Cargar registro de actividad
+    loadActivityLog();
 }
 
 function logout() {
@@ -1658,32 +1884,447 @@ const additionalStyles = `
 document.head.insertAdjacentHTML('beforeend', additionalStyles);
 
 // Función para simular actualizaciones en tiempo real
+// Reemplazar la función startRealTimeUpdates
 function startRealTimeUpdates() {
-    // Simular nuevas notificaciones cada 30 segundos
-    setInterval(() => {
-        if (Math.random() > 0.7) {
-            const notifications = [
-                {
-                    title: 'Nueva tarea asignada',
-                    message: 'Se te ha asignado una nueva tarea de alta prioridad',
-                    type: 'task'
-                },
-                {
-                    title: 'Comentario en tarea',
-                    message: 'Alguien ha comentado en una de tus tareas',
-                    type: 'comment'
-                },
-                {
-                    title: 'Tarea completada',
-                    message: 'Una tarea ha sido marcada como completada',
-                    type: 'success'
-                }
-            ];
-            
-            const randomNotif = notifications[Math.floor(Math.random() * notifications.length)];
-            createNotification(randomNotif.title, randomNotif.message, randomNotif.type);
+    // Ya no generaremos notificaciones aleatorias
+    console.log('Sistema de notificaciones en tiempo real iniciado');
+    
+    // En su lugar, configuramos una verificación periódica de tareas cercanas a su fecha límite
+    setInterval(checkDeadlines, 60000); // Verificar cada minuto
+}
+
+// Añadir función para verificar fechas límite de tareas
+function checkDeadlines() {
+    if (!appState.currentUser) return;
+    
+    const now = new Date();
+    const oneDayFromNow = new Date(now);
+    oneDayFromNow.setDate(now.getDate() + 1);
+    
+    // Buscar tareas asignadas al usuario actual que vencen pronto
+    const tasksAboutToExpire = appState.tasks.filter(task => {
+        if (task.assignee !== appState.currentUser.id) return false;
+        if (task.status === 'completed') return false;
+        
+        const deadline = new Date(task.deadline);
+        return deadline > now && deadline < oneDayFromNow;
+    });
+    
+    // Notificar sobre tareas que vencen pronto y que no han sido notificadas recientemente
+    tasksAboutToExpire.forEach(task => {
+        const lastNotification = appState.notifications.find(n => 
+            n.type === 'deadline' && 
+            n.relatedId === task.id &&
+            new Date(n.timestamp) > new Date(Date.now() - 12 * 60 * 60 * 1000) // En las últimas 12 horas
+        );
+        
+        if (!lastNotification) {
+            createNotification(
+                'Tarea próxima a vencer',
+                `La tarea "${task.title}" vence en menos de 24 horas`,
+                'deadline',
+                appState.currentUser.id,
+                task.id
+            );
         }
-    }, 30000);
+    });
+    
+    // Verificar tareas vencidas
+    const overdueFilter = document.getElementById('overdueFilter');
+    if (overdueFilter) {
+        const overdueCount = appState.tasks.filter(t => 
+            t.assignee === appState.currentUser.id && 
+            t.status !== 'completed' && 
+            new Date(t.deadline) < now
+        ).length;
+        
+        overdueFilter.querySelector('.filter-count').textContent = overdueCount;
+    }
+}
+
+// Modificar la función createNotification
+function createNotification(title, message, type, targetUser = null, relatedId = null) {
+    const notification = {
+        id: generateId(),
+        title: title,
+        message: message,
+        type: type,
+        targetUser: targetUser,
+        relatedId: relatedId,
+        timestamp: new Date().toISOString(),
+        read: false
+    };
+    
+    appState.notifications.push(notification);
+    
+    // Limitar a 100 notificaciones para no sobrecargar localStorage
+    if (appState.notifications.length > 100) {
+        // Mantener las notificaciones no leídas y las más recientes
+        const unreadNotifications = appState.notifications.filter(n => !n.read);
+        const readNotifications = appState.notifications.filter(n => n.read)
+            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+            .slice(0, 100 - unreadNotifications.length);
+        
+        appState.notifications = [...unreadNotifications, ...readNotifications];
+    }
+    
+    saveDataToStorage();
+    updateNotificationBadge();
+    
+    // Si el usuario está viendo la sección de notificaciones, actualizar
+    if (document.getElementById('notificationsSection').classList.contains('active')) {
+        loadNotifications();
+    }
+    
+    // Mostrar notificación en pantalla si es para el usuario actual
+    if (!targetUser || targetUser === appState.currentUser.id) {
+        showToast(title, message, type);
+    }
+}
+
+// Añadir función para mostrar notificaciones en pantalla
+function showToast(title, message, type) {
+    // Crear elemento de notificación
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <div class="toast-icon">
+            <i class="fas ${getNotificationIcon(type)}"></i>
+        </div>
+        <div class="toast-content">
+            <h4>${title}</h4>
+            <p>${message}</p>
+        </div>
+        <button class="toast-close">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    // Añadir al DOM
+    const toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) {
+        // Crear contenedor si no existe
+        const container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+        container.appendChild(toast);
+    } else {
+        toastContainer.appendChild(toast);
+    }
+    
+    // Configurar cierre automático
+    setTimeout(() => {
+        toast.classList.add('toast-hiding');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 5000);
+    
+    // Evento para cerrar manualmente
+    toast.querySelector('.toast-close').addEventListener('click', () => {
+        toast.classList.add('toast-hiding');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    });
+}
+
+// Gestión de usuarios
+function showNewUserModal() {
+    document.getElementById('userModalTitle').textContent = 'Nuevo Usuario';
+    document.getElementById('userForm').reset();
+    document.getElementById('userForm').dataset.userId = '';
+    
+    // Por defecto, habilitar la creación y edición de tareas
+    document.getElementById('permCreate').checked = true;
+    document.getElementById('permEdit').checked = true;
+    
+    document.getElementById('userModal').classList.add('active');
+}
+
+function closeUserModal() {
+    document.getElementById('userModal').classList.remove('active');
+}
+
+function loadUsersTable() {
+    const tableBody = document.getElementById('usersTableBody');
+    if (!tableBody) return;
+    
+    tableBody.innerHTML = '';
+    
+    // Combinar usuarios predefinidos y del equipo
+    const allUsers = [...appState.team];
+    
+    // Añadir el usuario admin si no está ya incluido
+    if (!allUsers.find(u => u.id === 'admin-001')) {
+        allUsers.push({
+            id: 'admin-001',
+            name: 'Administrador',
+            email: 'admin@netzerd.com',
+            role: 'Administrator',
+            isAdmin: true
+        });
+    }
+    
+    allUsers.forEach(user => {
+        // Contar tareas asignadas al usuario
+        const userTasks = appState.tasks.filter(t => t.assignee === user.id);
+        const completedTasks = userTasks.filter(t => t.status === 'completed').length;
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <div class="user-cell">
+                    <img src="${user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=2563eb&color=fff`}" alt="${user.name}" class="user-avatar-small">
+                    <span>${user.name}</span>
+                </div>
+            </td>
+            <td>${user.email || 'N/A'}</td>
+            <td>${user.role}</td>
+            <td><span class="status-badge ${user.isAdmin ? 'status-admin' : 'status-active'}">
+                ${user.isAdmin ? 'Administrador' : 'Activo'}</span>
+            </td>
+            <td>${userTasks.length} (${completedTasks} completadas)</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn-icon" onclick="editUser('${user.id}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon" onclick="assignTasks('${user.id}')">
+                        <i class="fas fa-tasks"></i>
+                    </button>
+                    <button class="btn-icon ${user.id === 'admin-001' ? 'disabled' : ''}" 
+                            onclick="deleteUser('${user.id}')" 
+                            ${user.id === 'admin-001' ? 'disabled' : ''}>
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+        
+        tableBody.appendChild(row);
+    });
+}
+
+function editUser(userId) {
+    const user = appState.team.find(u => u.id === userId) || 
+                (userId === 'admin-001' ? {
+                    id: 'admin-001',
+                    name: 'Administrador',
+                    email: 'admin@netzerd.com',
+                    role: 'Administrator',
+                    isAdmin: true,
+                    permissions: ['create', 'edit', 'delete', 'admin']
+                } : null);
+    
+    if (!user) return;
+    
+    document.getElementById('userModalTitle').textContent = 'Editar Usuario';
+    document.getElementById('userForm').dataset.userId = user.id;
+    
+    // Llenar el formulario
+    document.getElementById('userName').value = user.name || '';
+    document.getElementById('userEmail').value = user.email || '';
+    document.getElementById('userPassword').value = ''; // No mostramos la contraseña actual
+    document.getElementById('userRole').value = user.role || '';
+    document.getElementById('userSkills').value = (user.skills || []).join(', ');
+    
+    // Permisos
+    document.getElementById('permCreate').checked = user.permissions?.includes('create') || false;
+    document.getElementById('permEdit').checked = user.permissions?.includes('edit') || false;
+    document.getElementById('permDelete').checked = user.permissions?.includes('delete') || false;
+    document.getElementById('permAdmin').checked = user.permissions?.includes('admin') || false;
+    
+    document.getElementById('userModal').classList.add('active');
+}
+
+function deleteUser(userId) {
+    // No permitir eliminar al admin
+    if (userId === 'admin-001') return;
+    
+    if (confirm('¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.')) {
+        // Eliminar usuario
+        appState.team = appState.team.filter(u => u.id !== userId);
+        
+        // Reasignar tareas al administrador
+        appState.tasks.forEach(task => {
+            if (task.assignee === userId) {
+                task.assignee = 'admin-001';
+            }
+        });
+        
+        // Guardar cambios
+        saveDataToStorage();
+        
+        // Recargar tabla
+        loadUsersTable();
+        
+        // Notificación
+        createNotification('Usuario eliminado', 'El usuario ha sido eliminado correctamente', 'success');
+        
+        // Registro de actividad
+        createActivity('user_deleted', `Usuario eliminado por ${appState.currentUser.name}`);
+    }
+}
+
+function assignTasks(userId) {
+    // Implementar modal para asignar tareas rápidamente
+    alert(`Asignación de tareas para ${userId} - Funcionalidad en desarrollo`);
+    
+    // Aquí implementarías un modal que muestre las tareas disponibles
+    // y permita asignarlas al usuario seleccionado
+}
+
+// Registrar evento para guardar usuarios
+document.addEventListener('DOMContentLoaded', () => {
+    const userForm = document.getElementById('userForm');
+    if (userForm) {
+        userForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            saveUser();
+        });
+    }
+});
+
+function saveUser() {
+    const userId = document.getElementById('userForm').dataset.userId;
+    const isNewUser = !userId;
+    
+    // Recoger permisos seleccionados
+    const permissions = [];
+    if (document.getElementById('permCreate').checked) permissions.push('create');
+    if (document.getElementById('permEdit').checked) permissions.push('edit');
+    if (document.getElementById('permDelete').checked) permissions.push('delete');
+    if (document.getElementById('permAdmin').checked) permissions.push('admin');
+    
+    // Crear objeto de usuario
+    const user = {
+        id: userId || generateId(),
+        name: document.getElementById('userName').value,
+        email: document.getElementById('userEmail').value,
+        password: document.getElementById('userPassword').value, // En producción, hashear la contraseña
+        role: document.getElementById('userRole').value,
+        skills: document.getElementById('userSkills').value.split(',').map(s => s.trim()).filter(s => s),
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(document.getElementById('userName').value)}&background=2563eb&color=fff`,
+        permissions: permissions,
+        isAdmin: permissions.includes('admin')
+    };
+    
+    // Si es admin y está editando su propio usuario, mantener el rol de admin
+    if (userId === 'admin-001') {
+        user.isAdmin = true;
+        if (!user.permissions.includes('admin')) {
+            user.permissions.push('admin');
+        }
+    }
+    
+    // Guardar o actualizar usuario
+    if (isNewUser) {
+        appState.team.push(user);
+        createActivity('user_created', `Usuario ${user.name} creado por ${appState.currentUser.name}`);
+    } else {
+        const index = appState.team.findIndex(u => u.id === userId);
+        if (index >= 0) {
+            // Si es una edición pero no se proporcionó contraseña, mantener la existente
+            if (!user.password && appState.team[index].password) {
+                user.password = appState.team[index].password;
+            }
+            appState.team[index] = user;
+        } else if (userId === 'admin-001') {
+            // Actualizar usuario admin en localStorage
+            const adminUser = JSON.parse(localStorage.getItem(APP_CONFIG.storage_prefix + 'session'));
+            adminUser.name = user.name;
+            adminUser.email = user.email;
+            if (user.password) adminUser.password = user.password;
+            localStorage.setItem(APP_CONFIG.storage_prefix + 'session', JSON.stringify(adminUser));
+        }
+        createActivity('user_updated', `Usuario ${user.name} actualizado por ${appState.currentUser.name}`);
+    }
+    
+    // Guardar cambios
+    saveDataToStorage();
+    
+    // Cerrar modal y actualizar vista
+    closeUserModal();
+    loadUsersTable();
+    
+    // Notificación
+    createNotification(
+        isNewUser ? 'Usuario creado' : 'Usuario actualizado',
+        `El usuario ${user.name} ha sido ${isNewUser ? 'creado' : 'actualizado'} correctamente`,
+        'success'
+    );
+}
+
+function loadActivityLog() {
+    const tableBody = document.getElementById('activityLogTableBody');
+    if (!tableBody) return;
+    
+    tableBody.innerHTML = '';
+    
+    // Mostrar últimas 50 actividades
+    const recentActivities = appState.activities
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 50);
+    
+    recentActivities.forEach(activity => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${formatDate(activity.timestamp)} ${new Date(activity.timestamp).toLocaleTimeString()}</td>
+            <td>${activity.user}</td>
+            <td>${getActivityTypeLabel(activity.type)}</td>
+            <td>${activity.description}</td>
+        `;
+        
+        tableBody.appendChild(row);
+    });
+}
+
+function getActivityTypeLabel(type) {
+    const labels = {
+        task_created: 'Tarea creada',
+        task_updated: 'Tarea actualizada',
+        task_completed: 'Tarea completada',
+        task_deleted: 'Tarea eliminada',
+        comment_added: 'Comentario añadido',
+        user_created: 'Usuario creado',
+        user_updated: 'Usuario actualizado',
+        user_deleted: 'Usuario eliminado',
+        login: 'Inicio de sesión',
+        logout: 'Cierre de sesión'
+    };
+    return labels[type] || type;
+}
+
+function filterActivityLog() {
+    // Implementar filtrado del registro de actividad
+    const type = document.getElementById('filterActivityType').value;
+    const startDate = document.getElementById('activityStartDate').value;
+    const endDate = document.getElementById('activityEndDate').value;
+    
+    // Aquí implementarías la lógica de filtrado
+    // Por ahora, solo recargamos el registro completo
+    loadActivityLog();
+}
+
+function exportUserData() {
+    const data = {
+        users: appState.team,
+        exportDate: new Date().toISOString(),
+        exportedBy: appState.currentUser.name
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `netzerd-users-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    createNotification('Exportación Exitosa', 'Los datos de usuarios han sido exportados correctamente', 'success');
 }
 
 // Iniciar actualizaciones en tiempo real
