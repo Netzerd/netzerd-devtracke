@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netzerd DevTracker Pro - Sistema de Gestión de Tareas</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <div class="logo">
+                <h1><i class="fas fa-code"></i> Netzerd DevTracker Pro</h1>
+                <p>Sistema Profesional de Gestión de Desarrollo</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <input type="email" id="loginEmail" placeholder="Email corporativo" required>
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" placeholder="Contraseña" required>
+                    <i class="fas fa-lock"></i>
+                </div>
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="mainDashboard" class="dashboard-container" style="display: none;">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-terminal"></i> Netzerd</h2>
+                <span class="version">v2.0 Pro</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+                <a href="#" class="nav-item" data-section="tasks">
+                    <i class="fas fa-tasks"></i> Tareas
+                </a>
+                <a href="#" class="nav-item" data-section="calendar">
+                    <i class="fas fa-calendar-alt"></i> Calendario
+                </a>
+                <a href="#" class="nav-item" data-section="projects">
+                    <i class="fas fa-project-diagram"></i> Proyectos
+                </a>
+                <a href="#" class="nav-item" data-section="team">
+                    <i class="fas fa-users"></i> Equipo
+                </a>
+                <a href="#" class="nav-item" data-section="reports">
+                    <i class="fas fa-chart-bar"></i> Reportes
+                </a>
+                <a href="#" class="nav-item" data-section="notifications">
+                    <i class="fas fa-bell"></i> Notificaciones
+                    <span class="badge" id="notifBadge">0</span>
+                </a>
+            </nav>
+            <div class="user-profile">
+                <img src="https://ui-avatars.com/api/?name=Usuario&background=0D8ABC&color=fff" alt="Avatar">
+                <div class="user-info">
+                    <span class="user-name" id="userName">Usuario</span>
+                    <span class="user-role" id="userRole">Developer</span>
+                </div>
+                <button class="btn-logout" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboardSection" class="content-section active">
+                <div class="section-header">
+                    <h1>Dashboard Principal</h1>
+                    <div class="header-actions">
+                        <button class="btn-primary" onclick="showNewTaskModal()">
+                            <i class="fas fa-plus"></i> Nueva Tarea
+                        </button>
+                        <button class="btn-secondary" onclick="exportData()">
+                            <i class="fas fa-download"></i> Exportar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-primary">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="totalTasks">0</h3>
+                            <p>Tareas Totales</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="completedTasks">0</h3>
+                            <p>Completadas</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-warning">
+                            <i class="fas fa-spinner"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="inProgressTasks">0</h3>
+                            <p>En Progreso</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon bg-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="overdueTasks">0</h3>
+                            <p>Atrasadas</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Timeline -->
+                <div class="activity-section">
+                    <h2>Actividad Reciente</h2>
+                    <div id="activityTimeline" class="timeline">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+
+                <!-- Progress Charts -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>Progreso Mensual</h3>
+                        <canvas id="monthlyProgress"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Distribución por Tipo</h3>
+                        <canvas id="taskDistribution"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tasks Section -->
+            <section id="tasksSection" class="content-section">
+                <div class="section-header">
+                    <h1>Gestión de Tareas</h1>
+                    <div class="filters">
+                        <select id="filterStatus" class="filter-select">
+                            <option value="">Todos los estados</option>
+                            <option value="pending">Pendiente</option>
+                            <option value="in-progress">En Progreso</option>
+                            <option value="review">En Revisión</option>
+                            <option value="completed">Completado</option>
+                        </select>
+                        <select id="filterPriority" class="filter-select">
+                            <option value="">Todas las prioridades</option>
+                            <option value="high">Alta</option>
+                            <option value="medium">Media</option>
+                            <option value="low">Baja</option>
+                        </select>
+                        <input type="search" id="searchTasks" placeholder="Buscar tareas..." class="search-input">
+                    </div>
+                </div>
+
+                <!-- Kanban Board -->
+                <div class="kanban-board">
+                    <div class="kanban-column" data-status="pending">
+                        <div class="column-header">
+                            <h3>Pendientes</h3>
+                            <span class="task-count">0</span>
+                        </div>
+                        <div class="tasks-container" id="pendingTasks">
+                            <!-- Dynamic tasks -->
+                        </div>
+                    </div>
+                    <div class="kanban-column" data-status="in-progress">
+                        <div class="column-header">
+                            <h3>En Progreso</h3>
+                            <span class="task-count">0</span>
+                        </div>
+                        <div class="tasks-container" id="inProgressTasksList">
+                            <!-- Dynamic tasks -->
+                        </div>
+                    </div>
+                    <div class="kanban-column" data-status="review">
+                        <div class="column-header">
+                            <h3>En Revisión</h3>
+                            <span class="task-count">0</span>
+                        </div>
+                        <div class="tasks-container" id="reviewTasks">
+                            <!-- Dynamic tasks -->
+                        </div>
+                    </div>
+                    <div class="kanban-column" data-status="completed">
+                        <div class="column-header">
+                            <h3>Completadas</h3>
+                            <span class="task-count">0</span>
+                        </div>
+                        <div class="tasks-container" id="completedTasksList">
+                            <!-- Dynamic tasks -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Calendar Section -->
+            <section id="calendarSection" class="content-section">
+                <div class="section-header">
+                    <h1>Calendario de Actividades</h1>
+                    <div class="calendar-controls">
+                        <button class="btn-secondary" onclick="calendarView('month')">Mes</button>
+                        <button class="btn-secondary" onclick="calendarView('week')">Semana</button>
+                        <button class="btn-secondary" onclick="calendarView('day')">Día</button>
+                    </div>
+                </div>
+                <div id="calendar" class="calendar-container"></div>
+            </section>
+
+            <!-- Projects Section -->
+            <section id="projectsSection" class="content-section">
+                <div class="section-header">
+                    <h1>Proyectos Activos</h1>
+                    <button class="btn-primary" onclick="showNewProjectModal()">
+                        <i class="fas fa-plus"></i> Nuevo Proyecto
+                    </button>
+                </div>
+                <div class="projects-grid" id="projectsGrid">
+                    <!-- Dynamic projects -->
+                </div>
+            </section>
+
+            <!-- Team Section -->
+            <section id="teamSection" class="content-section">
+                <div class="section-header">
+                    <h1>Equipo de Desarrollo</h1>
+                </div>
+                <div class="team-grid" id="teamGrid">
+                    <!-- Dynamic team members -->
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reportsSection" class="content-section">
+                <div class="section-header">
+                    <h1>Reportes y Análisis</h1>
+                    <div class="report-filters">
+                        <input type="date" id="reportStartDate" class="date-input">
+                        <input type="date" id="reportEndDate" class="date-input">
+                        <button class="btn-primary" onclick="generateReport()">Generar Reporte</button>
+                    </div>
+                </div>
+                <div class="report-content" id="reportContent">
+                    <!-- Dynamic reports -->
+                </div>
+            </section>
+
+            <!-- Notifications Section -->
+            <section id="notificationsSection" class="content-section">
+                <div class="section-header">
+                    <h1>Centro de Notificaciones</h1>
+                    <button class="btn-secondary" onclick="markAllAsRead()">
+                        <i class="fas fa-check-double"></i> Marcar todas como leídas
+                    </button>
+                </div>
+                <div class="notifications-list" id="notificationsList">
+                    <!-- Dynamic notifications -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nueva Tarea</h2>
+                <button class="close-modal" onclick="closeTaskModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="taskForm" class="modal-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Título de la Tarea</label>
+                        <input type="text" id="taskTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Tarea</label>
+                        <select id="taskType" required>
+                            <option value="feature">Nueva Funcionalidad</option>
+                            <option value="bug">Corrección de Bug</option>
+                            <option value="refactor">Refactorización</option>
+                            <option value="testing">Testing</option>
+                            <option value="documentation">Documentación</option>
+                            <option value="deployment">Despliegue</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Descripción Detallada</label>
+                    <textarea id="taskDescription" rows="4" required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Proyecto</label>
+                        <select id="taskProject" required>
+                            <option value="">Seleccionar proyecto</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Asignado a</label>
+                        <select id="taskAssignee" required>
+                            <option value="">Seleccionar desarrollador</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Prioridad</label>
+                        <select id="taskPriority" required>
+                            <option value="low">Baja</option>
+                            <option value="medium">Media</option>
+                            <option value="high">Alta</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha de Entrega</label>
+                        <input type="datetime-local" id="taskDeadline" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Estimación (horas)</label>
+                    <input type="number" id="taskEstimation" min="1" max="999" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Etiquetas (separadas por comas)</label>
+                    <input type="text" id="taskTags" placeholder="backend, api, database">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeTaskModal()">Cancelar</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Guardar Tarea
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task Detail Modal -->
+    <div id="taskDetailModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2 id="detailModalTitle">Detalles de la Tarea</h2>
+                <button class="close-modal" onclick="closeTaskDetailModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="task-detail-content">
+                <div class="detail-main">
+                    <div class="detail-info" id="taskDetailInfo">
+                        <!-- Dynamic content -->
+                    </div>
+                    
+                    <div class="progress-section">
+                        <h3>Progreso de la Tarea</h3>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="taskProgressBar"></div>
+                            <span class="progress-text" id="taskProgressText">0%</span>
+                        </div>
+                        <input type="range" id="progressSlider" min="0" max="100" step="5" onchange="updateTaskProgress(this.value)">
+                    </div>
+
+                    <div class="comments-section">
+                        <h3>Comentarios y Actualizaciones</h3>
+                        <div class="comment-form">
+                            <textarea id="newComment" placeholder="Añadir un comentario..." rows="3"></textarea>
+                            <button class="btn-primary" onclick="addComment()">
+                                <i class="fas fa-paper-plane"></i> Enviar
+                            </button>
+                        </div>
+                        <div class="comments-list" id="commentsList">
+                            <!-- Dynamic comments -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detail-sidebar">
+                    <div class="activity-log">
+                        <h3>Registro de Actividad</h3>
+                        <div id="taskActivityLog">
+                            <!-- Dynamic activity -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
