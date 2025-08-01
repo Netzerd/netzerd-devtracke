@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏨 Jaravid Horal Capurgana - Sistema Netzerd</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        * { 
+            font-family: 'Inter', sans-serif; 
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --main-gradient: linear-gradient(135deg, #4ae257 0%, #5df17d 50%, #abffc7 100%);
+            --card-radius: clamp(16px, 4vw, 24px);
+            --spacing-sm: clamp(8px, 2vw, 16px);
+            --spacing-md: clamp(16px, 4vw, 32px);
+            --spacing-lg: clamp(24px, 6vw, 48px);
+            --text-sm: clamp(12px, 3vw, 14px);
+            --text-base: clamp(14px, 4vw, 16px);
+            --text-lg: clamp(16px, 5vw, 20px);
+            --text-xl: clamp(20px, 6vw, 28px);
+            --text-2xl: clamp(24px, 7vw, 36px);
+            --text-3xl: clamp(32px, 8vw, 48px);
+        }
+        
+        body {
+            background: var(--main-gradient);
+            min-height: 100vh;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .star {
+            font-size: clamp(24px, 6vw, 32px);
+            color: #d1d5db;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            display: inline-block;
+            margin: 0 2px;
+        }
+        
+        .star.selected {
+            color: #fbbf24;
+            transform: scale(1.1);
+        }
+        
+        .star:hover {
+            transform: scale(1.2);
+        }
+        
+        .video-container {
+            aspect-ratio: 16/9;
+            border-radius: var(--card-radius);
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            position: relative;
+        }
+        
+        @media (max-width: 768px) {
+            .video-container {
+                aspect-ratio: 9/16;
+            }
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-lg);
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-md);
+        }
+        
+        @media (min-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+        
+        .content-section {
+            background: white;
+            border-radius: var(--card-radius);
+            padding: var(--spacing-md);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .responsive-text {
+            font-size: var(--text-base);
+            line-height: 1.6;
+        }
+        
+        .responsive-title {
+            font-size: var(--text-3xl);
+            font-weight: 900;
+            line-height: 1.2;
+        }
+        
+        .responsive-subtitle {
+            font-size: var(--text-xl);
+            font-weight: 700;
+        }
+        
+        .btn-responsive {
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--card-radius);
+            font-weight: 600;
+            font-size: var(--text-base);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            width: 100%;
+            text-decoration: none;
+        }
+        
+        @media (min-width: 768px) {
+            .btn-responsive {
+                width: auto;
+            }
+        }
+        
+        .amenidades-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--spacing-sm);
+        }
+        
+        @media (max-width: 480px) {
+            .amenidades-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+        }
+        
+        .review-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: var(--card-radius);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .cupon-input {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #f59e0b;
+            border-radius: var(--card-radius);
+            padding: var(--spacing-sm);
+            font-weight: 600;
+            text-align: center;
+            font-size: var(--text-base);
+            width: 100%;
+        }
+        
+        .cupon-valido {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-color: #10b981;
+            color: #065f46;
+        }
+        
+        .cupon-invalido {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .loading {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .netzerd-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .netzerd-connecting {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+        
+        .netzerd-connected {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .netzerd-error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .realtime-notification {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            z-index: 1000;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+            transform: translateX(400px);
+            transition: all 0.5s ease;
+            max-width: 300px;
+        }
+        
+        .realtime-notification.show {
+            transform: translateX(0);
+        }
+        
+        @media (max-width: 640px) {
+            .main-grid {
+                padding: var(--spacing-sm);
+                gap: var(--spacing-md);
+            }
+            
+            .content-section {
+                padding: var(--spacing-sm);
+                margin-bottom: var(--spacing-md);
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-sm);
+            }
+            
+            .netzerd-status {
+                top: 10px;
+                right: 10px;
+                font-size: 10px;
+                padding: 6px 12px;
+            }
+            
+            .realtime-notification {
+                top: 50px;
+                right: 10px;
+                left: 10px;
+                font-size: 12px;
+                padding: 10px 14px;
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .real-global {
+            background: linear-gradient(135deg, #10b981, #059669);
+            animation: pulse 2s infinite;
+        }
+
+        /* ✨ ESTILOS PARA SERVICIOS COMPACTOS */
+        .service-compact-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+            cursor: pointer;
+        }
+        
+        .service-compact-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
+        }
+        
+        .service-compact-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .service-compact-title {
+            font-weight: 600;
+            font-size: 12px;
+            color: #495057;
+            line-height: 1.3;
+        }
+        
+        .services-compact-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        
+        @media (max-width: 640px) {
+            .services-compact-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 🌐 ESTADO SISTEMA NETZERD -->
+<div id="netzerdStatus" class="netzerd-status netzerd-connecting">
+    🔄 Conectando Sistema Netzerd...
+</div>
+
+<!-- 🔔 NOTIFICACIÓN TIEMPO REAL -->
+<div id="realtimeNotification" class="realtime-notification">
+    🌍 Nueva reseña en tiempo real!
+</div>
+
+<!-- 📱 HEADER -->
+<div class="glass-effect" style="margin: var(--spacing-md); border-radius: var(--card-radius); padding: var(--spacing-md);">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <button onclick="window.history.back()" class="flex items-center space-x-3 text-white hover:text-yellow-300 font-bold transition-all">
+            <span class="text-2xl">←</span>
+            <span class="responsive-text">-------</span>
+        </button>
+        <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
+                <span class="text-xl font-black text-purple-600">🇨🇴</span>
+            </div>
+            <div class="text-white text-center sm:text-left">
+                <div class="font-black responsive-subtitle">Jarvid Hostal Capurgana</div>
+                <div class="text-sm opacity-80">Sistema Netzerd</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 🏨 MAIN CONTENT -->
+<div class="main-grid">
+    
+    <!-- 📱 COLUMNA PRINCIPAL -->
+    <div class="space-y-6">
+        
+        <!-- 🖼️ IMAGEN PRINCIPAL -->
+        <div class="content-section overflow-hidden">
+            <div class="relative h-64 sm:h-80 lg:h-96 overflow-hidden rounded-2xl">
+                <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=900&h=600&fit=crop" 
+                     alt="Jaravid Hostal Capurgana" 
+                     class="w-full h-full object-cover">
+                
+                <!-- 🏷️ BADGES -->
+                <div class="absolute top-4 left-4 space-y-2">
+                    <div class="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                        ✓ Verificado
+                    </div>
+                    <div class="bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                        🏆 Destacado
+                    </div>
+                    <div id="realGlobalBadge" class="real-global text-white px-3 py-1 rounded-full text-xs font-bold">
+                        🔥 Sistema Netzerd
+                    </div>
+                </div>
+                
+                <!-- ⭐ RATING -->
+                <div class="absolute top-4 right-4 bg-black/80 text-white px-4 py-2 rounded-xl">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-yellow-400 text-lg">⭐</span>
+                        <span id="ratingPrincipal" class="font-bold">4.9</span>
+                    </div>
+                </div>
+                
+                <!-- 💰 PRECIO -->
+                <div class="absolute bottom-4 left-4 bg-white/90 px-4 py-2 rounded-xl">
+                    <span class="text-xl font-black text-gray-800">$ Económico</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 🎬 VIDEO TOUR -->
+        <div class="content-section">
+            <h3 class="responsive-subtitle text-gray-800 mb-4 flex items-center">
+                <span class="text-2xl mr-3">🎥</span>
+                Video Tour Virtual
+            </h3>
+            
+            <div id="videoContainer" class="video-container mb-4 bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center">
+                <div class="absolute inset-0 flex items-center justify-center text-center text-gray-600 p-8 z-10">
+                    <div>
+                        <div class="text-6xl mb-4 floating">🎬</div>
+                        <h4 class="responsive-subtitle mb-2">Descubre Capurgana</h4>
+                        <p class="responsive-text mb-4">Conoce nuestras instalaciones y el paraíso que te espera</p>
+                        <button onclick="reproducirVideo()" class="btn-responsive bg-red-600 text-white hover:bg-red-700 shadow-lg">
+                            ▶️ Reproducir Video Tour
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="responsive-text text-gray-600 text-center">
+                Explora virtualmente cada rincón de nuestro hostal y enamórate de Capurgana
+            </p>
+        </div>
+        
+        <!-- 📝 DESCRIPCIÓN -->
+        <div class="content-section">
+            <div class="space-y-6">
+                <div>
+                    <h1 class="responsive-title text-gray-800 mb-4">
+                        Jaravid Hostal Capurgana
+                    </h1>
+                    <p class="responsive-subtitle text-purple-600 mb-3">
+                        Un remanso de paz en el corazón de Capurganá
+                    </p>
+                    <div class="flex items-center text-gray-600 mb-4">
+                        <span class="text-xl mr-3">📍</span>
+                        <span class="responsive-text">Capurgana, Chocó, Colombia</span>
+                    </div>
+                    
+                    <!-- ⭐ RATING Y RESEÑAS -->
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+                        <div id="estrellasDisplay" class="flex justify-center sm:justify-start"></div>
+                        <button onclick="scrollToReviews()" class="text-purple-600 hover:text-purple-800 font-semibold underline text-center sm:text-left">
+                            <span id="totalReseñasDisplay">Cargando desde Sistema Netzerd...</span> - Ver todas
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 📖 DESCRIPCIÓN COMPLETA -->
+                <div class="mb-6">
+                    <p class="responsive-text text-gray-700 leading-relaxed">
+                        Bienvenido a Jaravid Hostal Capurgana, estamos ubicados cerca de varias atracciones naturales. Entre ellas, destacan la Bahía el Aguacate, la Piscina de los Dioses y la Reserva Natural El Cielo. Estas ubicaciones ofrecen diversas actividades, como el disfrute de playas, la exploración de piscinas naturales y el contacto con la biodiversidad local. La cercanía a estos puntos turísticos convierte al hostal en una opción atractiva para quienes desean explorar la zona de Capurganá.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ✨ SERVICIOS INCLUIDOS - EN LA COLUMNA PRINCIPAL TAMBIÉN -->
+        <div class="content-section">
+            <h3 class="responsive-subtitle text-gray-800 mb-6 flex items-center">
+                <span class="text-3xl mr-3">✨</span>
+                Servicios Incluidos
+            </h3>
+            <div class="amenidades-grid">
+                <div class="bg-purple-50 p-4 rounded-xl text-center hover:bg-purple-100 transition-all border border-purple-100">
+                    <div class="text-2xl mb-2">🛎️</div>
+                    <div class="text-sm font-semibold text-gray-700">Servicio 24/7</div>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-xl text-center hover:bg-purple-100 transition-all border border-purple-100">
+                    <div class="text-2xl mb-2">📶</div>
+                    <div class="text-sm font-semibold text-gray-700">WiFi Gratis</div>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-xl text-center hover:bg-purple-100 transition-all border border-purple-100">
+                    <div class="text-2xl mb-2">🍳</div>
+                    <div class="text-sm font-semibold text-gray-700">Restaurante</div>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-xl text-center hover:bg-purple-100 transition-all border border-purple-100">
+                    <div class="text-2xl mb-2">👨‍👩‍👧‍👦</div>
+                    <div class="text-sm font-semibold text-gray-700">Familiar</div>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-xl text-center hover:bg-purple-100 transition-all border border-purple-100">
+                    <div class="text-2xl mb-2">🚿</div>
+                    <div class="text-sm font-semibold text-gray-700">Baños Privados</div>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-xl text-center hover:bg-purple-100 transition-all border border-purple-100">
+                    <div class="text-2xl mb-2">🌴</div>
+                    <div class="text-sm font-semibold text-gray-700">Terraza Vista</div>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-xl text-center hover:bg-purple-100 transition-all border border-purple-100">
+                    <div class="text-2xl mb-2">🔒</div>
+                    <div class="text-sm font-semibold text-gray-700">Casilleros</div>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-xl text-center hover:bg-purple-100 transition-all border border-purple-100">
+                    <div class="text-2xl mb-2">🏊‍♂️</div>
+                    <div class="text-sm font-semibold text-gray-700">Acceso Playa</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 📞 BOTONES DE ACCIÓN -->
+        <div class="content-section">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button onclick="contactar()" class="btn-responsive bg-purple-600 text-white hover:bg-purple-700 shadow-lg">
+                    <span class="text-xl">📞</span>
+                    <span>Contactar Ahora</span>
+                </button>
+                <button onclick="compartir()" class="btn-responsive bg-green-600 text-white hover:bg-green-700 shadow-lg">
+                    <span class="text-xl">📱</span>
+                    <span>Compartir</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 🏨 HABITACIONES -->
+        <div class="content-section">
+            <div class="mb-6">
+                <h2 class="responsive-subtitle text-gray-800 mb-4 flex items-center">
+                    <span class="text-3xl mr-3">🏨</span>
+                    Nuestras Habitaciones
+                </h2>
+                <p class="responsive-text text-gray-600">Elige la habitación perfecta para tu estadía</p>
+            </div>
+            
+            <div class="border border-gray-200 rounded-2xl overflow-hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-0">
+                    <div class="lg:col-span-1">
+                        <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=500&h=350&fit=crop" 
+                             alt="Habitación Standard" 
+                             class="w-full h-48 lg:h-full object-cover">
+                    </div>
+                    <div class="lg:col-span-2 p-6">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-4">
+                            <div>
+                                <h3 class="responsive-subtitle text-gray-800 mb-2">Habitación Vista Mar</h3>
+                                <p class="text-purple-600 font-semibold">👥 2 personas</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-black text-purple-600">$120.000</div>
+                                <div class="text-sm text-gray-500">$28 USD/noche</div>
+                            </div>
+                        </div>
+                        
+                        <p class="responsive-text text-gray-700 mb-4">
+                            Habitación cómoda con vista al mar Caribe, cama doble y baño privado.
+                        </p>
+                        
+                        <div class="mb-6">
+                            <h4 class="font-semibold text-gray-800 mb-3">✨ Incluye:</h4>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-green-500">✓</span>
+                                    <span class="text-sm text-gray-600">Cama doble</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-green-500">✓</span>
+                                    <span class="text-sm text-gray-600">Vista al mar</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-green-500">✓</span>
+                                    <span class="text-sm text-gray-600">Baño privado</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-green-500">✓</span>
+                                    <span class="text-sm text-gray-600">WiFi gratis</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button onclick="consultarDisponibilidad()" 
+                                    class="btn-responsive bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600">
+                                📅 Ver Disponibilidad
+                            </button>
+                            <button onclick="reservarDirecto()" 
+                                    class="btn-responsive bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600">
+                                🏨 Reservar Ahora
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 🗺️ MAPA -->
+        <div class="content-section overflow-hidden">
+            <div class="mb-6">
+                <h2 class="responsive-subtitle text-gray-800 mb-4 flex items-center">
+                    <span class="text-3xl mr-3">🗺️</span>
+                    Ubicación
+                </h2>
+                <p class="responsive-text text-gray-600">Explora el área y encuentra todo lo que necesitas cerca</p>
+            </div>
+            
+            <div class="h-64 sm:h-80 lg:h-96 bg-gray-200 relative overflow-hidden rounded-2xl">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.635738791147!2d-77.35126918576447!3d8.617049098681434!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e5a2f6c8d4b1234%3A0x123456789abcdef!2sCapurgan%C3%A1%2C%20Choc%C3%B3%2C%20Colombia!5e0!3m2!1sen!2sco!4v1234567890123!5m2!1sen!2sco"
+                    width="100%"
+                    height="100%"
+                    style="border:0;"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        </div>
+        
+        <!-- 💬 SISTEMA DE RESEÑAS NETZERD -->
+        <div class="content-section" id="reviewsSection">
+            <h2 class="responsive-subtitle text-gray-800 mb-6 flex items-center">
+                <span class="text-3xl mr-3">💬</span>
+                Reseñas Sistema Netzerd
+                <span id="netzerdStatusBadge" class="ml-4 text-sm bg-orange-100 text-orange-800 px-3 py-1 rounded-full pulse">🔄 Conectando...</span>
+            </h2>
+            
+            <!-- 📊 RESUMEN DE CALIFICACIONES -->
+            <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 mb-6">
+                <div class="stats-grid">
+                    <div class="text-center">
+                        <div id="promedioRating" class="text-4xl sm:text-6xl font-bold text-purple-600 mb-4">-</div>
+                        <div id="promedioEstrellas" class="flex justify-center mb-4"></div>
+                        <div id="cantidadReseñas" class="responsive-text text-gray-600">Conectando a Sistema Netzerd...</div>
+                        <div id="netzerdInfo" class="text-xs text-gray-500 mt-2">
+                            <span class="inline-flex items-center">
+                                <span class="w-2 h-2 bg-orange-400 rounded-full mr-2 pulse"></span>
+                                Sistema Netzerd sincronizando...
+                            </span>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm font-medium w-12">5⭐</span>
+                            <div class="flex-1 bg-gray-200 rounded-full h-3">
+                                <div id="bar5" class="bg-yellow-400 h-3 rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <span id="pct5" class="text-sm text-gray-600 w-8">0%</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm font-medium w-12">4⭐</span>
+                            <div class="flex-1 bg-gray-200 rounded-full h-3">
+                                <div id="bar4" class="bg-yellow-400 h-3 rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <span id="pct4" class="text-sm text-gray-600 w-8">0%</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm font-medium w-12">3⭐</span>
+                            <div class="flex-1 bg-gray-200 rounded-full h-3">
+                                <div id="bar3" class="bg-yellow-400 h-3 rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <span id="pct3" class="text-sm text-gray-600 w-8">0%</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm font-medium w-12">2⭐</span>
+                            <div class="flex-1 bg-gray-200 rounded-full h-3">
+                                <div id="bar2" class="bg-yellow-400 h-3 rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <span id="pct2" class="text-sm text-gray-600 w-8">0%</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm font-medium w-12">1⭐</span>
+                            <div class="flex-1 bg-gray-200 rounded-full h-3">
+                                <div id="bar1" class="bg-yellow-400 h-3 rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                            <span id="pct1" class="text-sm text-gray-600 w-8">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 🎫 SISTEMA DE CUPONES -->
+            <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-6 mb-6 border-2 border-yellow-200">
+                <h3 class="responsive-subtitle flex items-center mb-4">
+                    <span class="text-2xl mr-3">🎫</span>
+                    Deja tu Reseña Global
+                    <span class="ml-4 text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full">🔥 Sistema Netzerd</span>
+                </h3>
+                
+                <!-- 🔑 VALIDACIÓN DE CUPÓN -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block font-semibold text-gray-800 mb-2">
+                            🔐 ID de Reseña (proporcionado por el hostal):
+                        </label>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <input type="text" 
+                                   id="codigoCupon" 
+                                   placeholder="Ej: CAPURGANA2025"
+                                   class="cupon-input">
+                            <button onclick="validarCupon()" 
+                                    class="btn-responsive bg-blue-600 text-white hover:bg-blue-700">
+                                🔍 Validar ID
+                            </button>
+                        </div>
+                        <div id="cuponStatus" class="mt-2 text-sm font-bold"></div>
+                    </div>
+                    
+                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                        <h4 class="font-semibold text-blue-800 mb-2">🔥 Sistema Netzerd en Tiempo Real!</h4>
+                        <ul class="text-sm text-blue-700 space-y-1">
+                            <li>• <strong>Códigos para probar: CAPURGANA2025 o NETZERD2024</strong></li>
+                            <li>• Tu reseña aparecerá INMEDIATAMENTE en TODOS los dispositivos</li>
+                            <li>• Sistema Netzerd sincronización global en tiempo real</li>
+                            <li>• Visible desde cualquier dispositivo del mundo</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- ✍️ FORMULARIO DE RESEÑA -->
+                <div id="formularioReseña" style="display: none;" class="space-y-6 mt-6 fade-in">
+                    <div class="bg-white p-6 rounded-2xl border-2 border-green-200">
+                        <h4 class="responsive-subtitle text-green-800 mb-4">✅ ¡ID válido! Tu reseña se guardará en Sistema Netzerd:</h4>
+                        
+                        <!-- ⭐ CALIFICACIÓN -->
+                        <div class="mb-6">
+                            <p class="font-semibold mb-3">Tu calificación:</p>
+                            <div class="flex justify-center sm:justify-start" id="starsContainer">
+                                <span class="star" data-rating="1">⭐</span>
+                                <span class="star" data-rating="2">⭐</span>
+                                <span class="star" data-rating="3">⭐</span>
+                                <span class="star" data-rating="4">⭐</span>
+                                <span class="star" data-rating="5">⭐</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2 text-center sm:text-left">
+                                Haz clic en las estrellas para calificar
+                            </p>
+                            <p id="ratingTexto" class="text-sm font-bold text-purple-600 mt-2 text-center sm:text-left" style="display: none;">
+                                Calificación: <span id="ratingNumero">0</span>/5
+                            </p>
+                        </div>
+                        
+                        <!-- 📝 DATOS DEL USUARIO -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                            <input type="text" 
+                                   id="nombre" 
+                                   placeholder="Tu nombre completo"
+                                   class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500">
+                            <select id="pais" 
+                                    class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500">
+                                <option value="">Selecciona tu país</option>
+                                <option value="🇨🇴 Colombia">🇨🇴 Colombia</option>
+                                <option value="🇺🇸 Estados Unidos">🇺🇸 Estados Unidos</option>
+                                <option value="🇲🇽 México">🇲🇽 México</option>
+                                <option value="🇦🇷 Argentina">🇦🇷 Argentina</option>
+                                <option value="🇨🇱 Chile">🇨🇱 Chile</option>
+                                <option value="🇵🇪 Perú">🇵🇪 Perú</option>
+                                <option value="🇪🇸 España">🇪🇸 España</option>
+                                <option value="🇫🇷 Francia">🇫🇷 Francia</option>
+                                <option value="🇩🇪 Alemania">🇩🇪 Alemania</option>
+                                <option value="🇧🇷 Brasil">🇧🇷 Brasil</option>
+                                <option value="🇨🇦 Canadá">🇨🇦 Canadá</option>
+                                <option value="🇬🇧 Reino Unido">🇬🇧 Reino Unido</option>
+                                <option value="🌍 Otro país">🌍 Otro país</option>
+                            </select>
+                        </div>
+                        
+                        <textarea id="comentario" 
+                                  placeholder="Cuéntanos sobre tu experiencia en Capurgana..."
+                                  rows="4"
+                                  class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 mb-4"></textarea>
+                        
+                        <button onclick="enviarReseñaNetzerd()" 
+                                class="btn-responsive bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 shadow-lg">
+                            <span id="enviarTexto">🔥 Publicar en Sistema Netzerd</span>
+                            <span id="enviarLoading" style="display: none;" class="loading">🔄</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 📋 LISTA DE RESEÑAS SISTEMA NETZERD -->
+            <div id="listaReseñas" class="space-y-4">
+                <div class="text-center py-12 text-gray-500">
+                    <div class="text-6xl mb-4 loading">🔥</div>
+                    <h3 class="responsive-subtitle mb-2">Conectando a Sistema Netzerd...</h3>
+                    <p class="responsive-text">Cargando reseñas desde Base de Datos Netzerd</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 📱 SIDEBAR -->
+    <div class="space-y-6">
+        
+        <!-- ✨ SERVICIOS COMPACTOS NETZERD (REEMPLAZA LA SECCIÓN GRANDE) -->
+        <div class="content-section">
+            <h3 class="responsive-subtitle text-gray-800 mb-4 flex items-center">
+                <span class="text-2xl mr-3">✨</span>
+                Servicios Incluidos
+            </h3>
+            
+            <div class="services-compact-grid">
+                <div class="service-compact-item">
+                    <span class="service-compact-icon">🛎️</span>
+                    <div class="service-compact-title">Servicio 24/7</div>
+                </div>
+                
+                <div class="service-compact-item">
+                    <span class="service-compact-icon">📶</span>
+                    <div class="service-compact-title">WiFi Gratis</div>
+                </div>
+                
+                <div class="service-compact-item">
+                    <span class="service-compact-icon">🍳</span>
+                    <div class="service-compact-title">Restaurante</div>
+                </div>
+                
+                <div class="service-compact-item">
+                    <span class="service-compact-icon">👨‍👩‍👧‍👦</span>
+                    <div class="service-compact-title">Familiar</div>
+                </div>
+                
+                <div class="service-compact-item">
+                    <span class="service-compact-icon">🚿</span>
+                    <div class="service-compact-title">Baños Privados</div>
+                </div>
+                
+                <div class="service-compact-item">
+                    <span class="service-compact-icon">🌴</span>
+                    <div class="service-compact-title">Terraza Vista</div>
+                </div>
+                
+                <div class="service-compact-item">
+                    <span class="service-compact-icon">🔒</span>
+                    <div class="service-compact-title">Casilleros</div>
+                </div>
+                
+                <div class="service-compact-item">
+                    <span class="service-compact-icon">🏊‍♂️</span>
+                    <div class="service-compact-title">Acceso Playa</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 📞 CONTACTO DIRECTO -->
+        <div class="content-section">
+            <h3 class="responsive-subtitle text-gray-800 mb-4 flex items-center">
+                <span class="text-2xl mr-3">📞</span>
+                Contacto Directo
+            </h3>
+            
+            <div class="space-y-4">
+                <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
+                    <span class="text-2xl">📱</span>
+                    <div>
+                        <div class="font-semibold">WhatsApp</div>
+                        <div class="text-sm text-gray-600">+57 314 567 8901</div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
+                    <span class="text-2xl">📧</span>
+                    <div>
+                        <div class="font-semibold">Email</div>
+                        <div class="text-sm text-gray-600">hostal@capurgana.co</div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
+                    <span class="text-2xl">🕒</span>
+                    <div>
+                        <div class="font-semibold">Horario</div>
+                        <div class="text-sm text-gray-600">24/7 Disponible</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 🌟 LUGARES SIMILARES -->
+        <div class="content-section">
+            <h3 class="responsive-subtitle text-gray-800 mb-4 flex items-center">
+                <span class="text-2xl mr-3">🌟</span>
+                Lugares Similares
+            </h3>
+            
+            <div class="space-y-4">
+                <div onclick="abrirLugar('https://www.booking.com/hotel/co/boutique-cartagena.html')" 
+                     class="flex space-x-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200&h=150&fit=crop" 
+                         alt="Hotel Boutique" 
+                         class="w-16 h-12 object-cover rounded-lg">
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-sm text-gray-800">Hotel Boutique Cartagena</h4>
+                        <div class="flex items-center space-x-1">
+                            <span class="text-yellow-400 text-sm">⭐</span>
+                            <span class="text-sm text-gray-600">4.8</span>
+                        </div>
+                        <div class="text-xs text-blue-600 mt-1">📍 Cartagena</div>
+                    </div>
+                </div>
+                
+                <div onclick="abrirLugar('https://www.expedia.com/colombia-hotels-resort-playa-dorada.html')" 
+                     class="flex space-x-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=200&h=150&fit=crop" 
+                         alt="Resort Playa" 
+                         class="w-16 h-12 object-cover rounded-lg">
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-sm text-gray-800">Resort Playa Dorada</h4>
+                        <div class="flex items-center space-x-1">
+                            <span class="text-yellow-400 text-sm">⭐</span>
+                            <span class="text-sm text-gray-600">4.6</span>
+                        </div>
+                        <div class="text-xs text-blue-600 mt-1">🏖️ Costa Caribe</div>
+                    </div>
+                </div>
+                
+                <div onclick="abrirLugar('https://www.trivago.com/colombia-eco-lodge-san-andres')" 
+                     class="flex space-x-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=200&h=150&fit=crop" 
+                         alt="Eco Lodge" 
+                         class="w-16 h-12 object-cover rounded-lg">
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-sm text-gray-800">Eco Lodge San Andrés</h4>
+                        <div class="flex items-center space-x-1">
+                            <span class="text-yellow-400 text-sm">⭐</span>
+                            <span class="text-sm text-gray-600">4.7</span>
+                        </div>
+                        <div class="text-xs text-blue-600 mt-1">🌿 San Andrés</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 🔥 SISTEMA NETZERD SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+import { getDatabase, ref, push, onValue, set } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
+
+// 🔧 CONFIGURACIÓN SISTEMA NETZERD
+const CONFIG = {
+    whatsappNumber: '+573102189625',
+    cuponesValidos: [
+        'CAPURGANA2025', 'CARIBE123', 'HUESPED2024', 'CHOCO2024',
+        'NETZERD2024', 'PLAYA2024', 'VACACIONES', 'PARADISE',
+        'GUEST2024', 'TRAVEL2024'
+    ],
+    hotelId: 'hostal-capurgana',
+    // 🔥 CONFIGURACIÓN SISTEMA NETZERD:
+    netzerd: {
+        apiKey: "AIzaSyCnQmy8aHT0jM0UrtfeSaDvZBFvPH3iY2s",
+        authDomain: "hostal-capurgana-reviews.firebaseapp.com",
+        databaseURL: "https://hostal-capurgana-reviews-default-rtdb.firebaseio.com",
+        projectId: "hostal-capurgana-reviews",
+        storageBucket: "hostal-capurgana-reviews.appspot.com",
+        messagingSenderId: "690916758514",
+        appId: "1:690916758514:web:233b129572b9bf3303516b"
+    }
+};
+
+// 🔧 VARIABLES GLOBALES
+let ratingSeleccionado = 0;
+let cuponValido = false;
+let netzerdConnected = false;
+let netzerdApp = null;
+let database = null;
+let reviewsRef = null;
+let primeraConexion = true;
+
+// 🗄️ BASE DE DATOS LOCAL
+let ratingsDB = {
+    promedio: 0,
+    total: 0,
+    distribución: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+    reseñas: [],
+    ultimaActualizacion: new Date().toISOString()
+};
+
+// 🚀 INICIALIZACIÓN
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("🔥 Hostal Capurgana - Sistema Netzerd iniciado");
+    
+    // Inicializar Sistema Netzerd
+    inicializarSistemaNetzerd();
+    
+    // Configurar eventos
+    setupEstrellas();
+    setupValidacionEnter();
+    
+    console.log("✅ Sistema inicializado");
+});
+
+// 🔥 INICIALIZAR SISTEMA NETZERD
+async function inicializarSistemaNetzerd() {
+    try {
+        updateNetzerdStatus('connecting', '🔄 Conectando Sistema Netzerd...');
+        
+        console.log('🔥 Inicializando Sistema Netzerd...');
+        
+        // Inicializar con configuración Netzerd
+        netzerdApp = initializeApp(CONFIG.netzerd);
+        database = getDatabase(netzerdApp);
+        reviewsRef = ref(database, 'jaravid-hostal-capurgana-reviews');
+        
+        updateNetzerdStatus('connected', '🔥 Sistema Netzerd Conectado');
+        updateNetzerdStatusBadge('🔥 Sistema Netzerd Activo');
+        netzerdConnected = true;
+        
+        console.log('🔥 Configurando listener en tiempo real...');
+        
+        // Escuchar cambios en tiempo real
+        onValue(reviewsRef, (snapshot) => {
+            const data = snapshot.val();
+            console.log('🔥 Datos recibidos de Sistema Netzerd:', data);
+            
+            if (data) {
+                // Convertir objeto a array
+                const reseñasArray = Object.keys(data).map(key => ({
+                    ...data[key],
+                    netzerdKey: key,
+                    id: key
+                }));
+                
+                // Actualizar base de datos local
+                ratingsDB.reseñas = reseñasArray;
+                recalcularEstadisticas();
+                actualizarInterfaz();
+                
+                console.log('📊 Base de datos actualizada:', {
+                    total: ratingsDB.total,
+                    promedio: ratingsDB.promedio,
+                    reseñas: ratingsDB.reseñas.length
+                });
+                
+                // Notificar nuevas reseñas (excepto la primera carga)
+                if (ratingsDB.reseñas.length > 0 && !primeraConexion) {
+                    mostrarNotificacionTiempoReal('🔥 Nueva reseña desde Sistema Netzerd');
+                }
+                primeraConexion = false;
+                
+            } else {
+                console.log('🔥 No hay datos en Sistema Netzerd');
+                // No hay datos, mostrar interfaz vacía
+                ratingsDB = {
+                    promedio: 0,
+                    total: 0,
+                    distribución: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+                    reseñas: [],
+                    ultimaActualizacion: new Date().toISOString()
+                };
+                actualizarInterfaz();
+            }
+        }, (error) => {
+            console.error('❌ Error en listener Sistema Netzerd:', error);
+            updateNetzerdStatus('error', '❌ Error Sistema Netzerd');
+        });
+        
+        console.log('✅ Sistema Netzerd conectado exitosamente');
+        
+    } catch (error) {
+        console.error('❌ Error conectando Sistema Netzerd:', error);
+        updateNetzerdStatus('error', '❌ Error Sistema Netzerd');
+    }
+}
+
+// 🔄 ACTUALIZAR ESTADOS UI
+function updateNetzerdStatus(status, text) {
+    const statusEl = document.getElementById('netzerdStatus');
+    statusEl.className = `netzerd-status netzerd-${status}`;
+    statusEl.textContent = text;
+}
+
+function updateNetzerdStatusBadge(text) {
+    const badgeEl = document.getElementById('netzerdStatusBadge');
+    badgeEl.textContent = text;
+    badgeEl.className = 'ml-4 text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full';
+}
+
+// 🔔 MOSTRAR NOTIFICACIÓN TIEMPO REAL
+function mostrarNotificacionTiempoReal(mensaje) {
+    const notif = document.getElementById('realtimeNotification');
+    notif.textContent = mensaje;
+    notif.classList.add('show');
+    
+    setTimeout(() => {
+        notif.classList.remove('show');
+    }, 4000);
+}
+
+// 🔄 FUNCIÓN PARA RECALCULAR ESTADÍSTICAS
+function recalcularEstadisticas() {
+    ratingsDB.total = ratingsDB.reseñas.length;
+    ratingsDB.distribución = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    
+    if (ratingsDB.total === 0) {
+        ratingsDB.promedio = 0;
+        return;
+    }
+    
+    let suma = 0;
+    ratingsDB.reseñas.forEach(reseña => {
+        suma += reseña.rating;
+        ratingsDB.distribución[reseña.rating]++;
+    });
+    
+    ratingsDB.promedio = parseFloat((suma / ratingsDB.total).toFixed(1));
+    ratingsDB.ultimaActualizacion = new Date().toISOString();
+}
+
+// ⭐ CONFIGURAR ESTRELLAS
+function setupEstrellas() {
+    const estrellas = document.querySelectorAll('.star');
+    estrellas.forEach((estrella, index) => {
+        estrella.addEventListener('click', () => seleccionarRating(index + 1));
+    });
+}
+
+// 🔍 CONFIGURAR VALIDACIÓN CON ENTER
+function setupValidacionEnter() {
+    const inputCupon = document.getElementById('codigoCupon');
+    if (inputCupon) {
+        inputCupon.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                validarCupon();
+            }
+        });
+    }
+}
+
+// 🎫 VALIDAR CUPÓN
+window.validarCupon = function() {
+    const codigo = document.getElementById('codigoCupon').value.trim().toUpperCase();
+    const statusDiv = document.getElementById('cuponStatus');
+    const formulario = document.getElementById('formularioReseña');
+    const input = document.getElementById('codigoCupon');
+    
+    console.log('🔍 Validando código:', codigo);
+    
+    if (!codigo) {
+        statusDiv.innerHTML = '⚠️ Por favor ingresa un código válido';
+        statusDiv.className = 'mt-2 text-sm font-bold text-red-600';
+        cuponValido = false;
+        return;
+    }
+    
+    if (CONFIG.cuponesValidos.includes(codigo)) {
+        statusDiv.innerHTML = '✅ ¡Código válido! Ahora puedes dejar tu reseña';
+        statusDiv.className = 'mt-2 text-sm font-bold text-green-600';
+        input.className = 'cupon-input cupon-valido';
+        formulario.style.display = 'block';
+        cuponValido = true;
+        
+               // Animar entrada del formulario
+        setTimeout(() => {
+            formulario.classList.add('fade-in');
+        }, 100);
+    } else {
+        statusDiv.innerHTML = '❌ Código inválido. Contacta al hostal para obtener uno válido';
+        statusDiv.className = 'mt-2 text-sm font-bold text-red-600';
+        input.className = 'cupon-input cupon-invalido';
+        formulario.style.display = 'none';
+        cuponValido = false;
+    }
+};
+
+// ⭐ SELECCIONAR RATING
+window.seleccionarRating = function(rating) {
+    ratingSeleccionado = rating;
+    const estrellas = document.querySelectorAll('.star');
+    const ratingTexto = document.getElementById('ratingTexto');
+    const ratingNumero = document.getElementById('ratingNumero');
+    
+    estrellas.forEach((estrella, index) => {
+        if (index < rating) {
+            estrella.classList.add('selected');
+        } else {
+            estrella.classList.remove('selected');
+        }
+    });
+    
+    ratingTexto.style.display = 'block';
+    ratingNumero.textContent = rating;
+    
+    console.log('⭐ Rating seleccionado:', rating);
+};
+
+// 🔥 ENVIAR RESEÑA AL SISTEMA NETZERD
+window.enviarReseñaNetzerd = async function() {
+    if (!cuponValido) {
+        alert('⚠️ Primero debes validar tu código de reseña');
+        return;
+    }
+    
+    if (ratingSeleccionado === 0) {
+        alert('⚠️ Por favor selecciona una calificación');
+        return;
+    }
+    
+    const nombre = document.getElementById('nombre').value.trim();
+    const pais = document.getElementById('pais').value;
+    const comentario = document.getElementById('comentario').value.trim();
+    
+    if (!nombre || !pais || !comentario) {
+        alert('⚠️ Por favor completa todos los campos');
+        return;
+    }
+    
+    const enviarTexto = document.getElementById('enviarTexto');
+    const enviarLoading = document.getElementById('enviarLoading');
+    
+    try {
+        // Mostrar loading
+        enviarTexto.style.display = 'none';
+        enviarLoading.style.display = 'inline';
+        
+        if (!netzerdConnected) {
+            throw new Error('Sistema Netzerd no conectado');
+        }
+        
+        const nuevaReseña = {
+            rating: ratingSeleccionado,
+            nombre: nombre,
+            pais: pais,
+            comentario: comentario,
+            fecha: new Date().toISOString(),
+            timestamp: Date.now(),
+            verificado: true,
+            netzerdId: Date.now().toString(),
+            ip: 'hidden',
+            userAgent: 'hidden'
+        };
+        
+        console.log('🔥 Enviando reseña a Sistema Netzerd:', nuevaReseña);
+        
+        // Enviar a Sistema Netzerd
+        await push(reviewsRef, nuevaReseña);
+        
+        console.log('✅ Reseña enviada exitosamente a Sistema Netzerd');
+        
+        // Mostrar éxito
+        alert('🎉 ¡Gracias! Tu reseña se ha publicado en Sistema Netzerd y es visible globalmente en tiempo real');
+        
+        // Limpiar formulario
+        document.getElementById('nombre').value = '';
+        document.getElementById('pais').value = '';
+        document.getElementById('comentario').value = '';
+        document.getElementById('codigoCupon').value = '';
+        ratingSeleccionado = 0;
+        
+        // Resetear estrellas
+        document.querySelectorAll('.star').forEach(star => {
+            star.classList.remove('selected');
+        });
+        
+        // Ocultar formulario
+        document.getElementById('formularioReseña').style.display = 'none';
+        document.getElementById('ratingTexto').style.display = 'none';
+        cuponValido = false;
+        
+        // Resetear estados
+        document.getElementById('cuponStatus').innerHTML = '';
+        document.getElementById('codigoCupon').className = 'cupon-input';
+        
+        // Mostrar notificación
+        mostrarNotificacionTiempoReal('🔥 Tu reseña está visible globalmente!');
+        
+    } catch (error) {
+        console.error('❌ Error enviando reseña a Sistema Netzerd:', error);
+        alert('❌ Error enviando reseña. Por favor intenta nuevamente.');
+    } finally {
+        // Ocultar loading
+        enviarTexto.style.display = 'inline';
+        enviarLoading.style.display = 'none';
+    }
+};
+
+// 🔄 ACTUALIZAR INTERFAZ
+function actualizarInterfaz() {
+    // Actualizar promedio y total
+    document.getElementById('promedioRating').textContent = ratingsDB.promedio || '-';
+    document.getElementById('ratingPrincipal').textContent = ratingsDB.promedio || '4.9';
+    
+    // Actualizar texto de reseñas
+    const plural = ratingsDB.total === 1 ? 'reseña' : 'reseñas';
+    document.getElementById('cantidadReseñas').textContent = `${ratingsDB.total} ${plural} en Sistema Netzerd`;
+    document.getElementById('totalReseñasDisplay').textContent = `${ratingsDB.total} ${plural}`;
+    
+    // Actualizar info de Sistema Netzerd
+    const netzerdInfo = document.getElementById('netzerdInfo');
+    if (netzerdConnected) {
+        netzerdInfo.innerHTML = `
+            <span class="inline-flex items-center">
+                <span class="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                Sistema Netzerd sincronizado - ${new Date(ratingsDB.ultimaActualizacion).toLocaleTimeString()}
+            </span>
+        `;
+    }
+    
+    // Actualizar estrellas del promedio
+    actualizarEstrellasPromedio();
+    
+    // Actualizar barras de distribución
+    actualizarBarrasDistribucion();
+    
+    // Actualizar lista de reseñas
+    actualizarListaReseñas();
+}
+
+// ⭐ ACTUALIZAR ESTRELLAS PROMEDIO
+function actualizarEstrellasPromedio() {
+    const container = document.getElementById('promedioEstrellas');
+    const containerDisplay = document.getElementById('estrellasDisplay');
+    
+    if (!container || !containerDisplay) return;
+    
+    const promedio = ratingsDB.promedio || 0;
+    let estrellasHTML = '';
+    
+    for (let i = 1; i <= 5; i++) {
+        if (i <= promedio) {
+            estrellasHTML += '<span class="text-yellow-400 text-xl">⭐</span>';
+        } else if (i - 0.5 <= promedio) {
+            estrellasHTML += '<span class="text-yellow-400 text-xl">⭐</span>';
+        } else {
+            estrellasHTML += '<span class="text-gray-300 text-xl">⭐</span>';
+        }
+    }
+    
+    container.innerHTML = estrellasHTML;
+    containerDisplay.innerHTML = estrellasHTML;
+}
+
+// 📊 ACTUALIZAR BARRAS DE DISTRIBUCIÓN
+function actualizarBarrasDistribucion() {
+    for (let i = 1; i <= 5; i++) {
+        const cantidad = ratingsDB.distribución[i] || 0;
+        const porcentaje = ratingsDB.total > 0 ? Math.round((cantidad / ratingsDB.total) * 100) : 0;
+        
+        const barra = document.getElementById(`bar${i}`);
+        const texto = document.getElementById(`pct${i}`);
+        
+        if (barra && texto) {
+            barra.style.width = `${porcentaje}%`;
+            texto.textContent = `${porcentaje}%`;
+        }
+    }
+}
+
+// 📋 ACTUALIZAR LISTA DE RESEÑAS
+function actualizarListaReseñas() {
+    const container = document.getElementById('listaReseñas');
+    if (!container) return;
+    
+    if (ratingsDB.reseñas.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-12 text-gray-500">
+                <div class="text-6xl mb-4">💬</div>
+                <h3 class="responsive-subtitle mb-2">No hay reseñas aún</h3>
+                <p class="responsive-text">¡Sé el primero en dejar una reseña en Sistema Netzerd!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Ordenar reseñas por fecha (más recientes primero)
+    const reseñasOrdenadas = [...ratingsDB.reseñas].sort((a, b) => 
+        new Date(b.fecha) - new Date(a.fecha)
+    );
+    
+    let html = '';
+    reseñasOrdenadas.forEach(reseña => {
+        const fecha = new Date(reseña.fecha).toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        const estrellas = '⭐'.repeat(reseña.rating) + '☆'.repeat(5 - reseña.rating);
+        
+        html += `
+            <div class="review-card fade-in">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-4">
+                    <div>
+                        <h4 class="font-bold text-gray-800">${reseña.nombre}</h4>
+                        <p class="text-sm text-gray-600">${reseña.pais}</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-yellow-400 text-lg">${estrellas}</div>
+                        <div class="text-xs text-gray-500">${fecha}</div>
+                        <div class="text-xs text-orange-600 mt-1">🔥 Sistema Netzerd</div>
+                    </div>
+                </div>
+                <p class="text-gray-700 leading-relaxed">${reseña.comentario}</p>
+                ${reseña.verificado ? '<div class="mt-3 text-xs text-green-600 font-semibold">✅ Reseña verificada</div>' : ''}
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+// 📞 FUNCIONES DE CONTACTO
+window.contactar = function() {
+    const mensaje = encodeURIComponent('¡Hola! Me interesa hacer una reserva en Hostal Capurgana. ¿Podrían darme más información?');
+    const url = `https://wa.me/${CONFIG.whatsappNumber.replace('+', '')}?text=${mensaje}`;
+    window.open(url, '_blank');
+};
+
+window.compartir = function() {
+    if (navigator.share) {
+        navigator.share({
+            title: 'Jaravid Hostal Capurgana - Sistema Netzerd',
+            text: '¡Descubre este increíble lugar en Capurganá!',
+            url: window.location.href
+        });
+    } else {
+        // Fallback para navegadores que no soportan Web Share API
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            alert('🔗 Enlace copiado al portapapeles');
+        });
+    }
+};
+
+// 🎬 REPRODUCIR VIDEO
+window.reproducirVideo = function() {
+    const container = document.getElementById('videoContainer');
+    container.innerHTML = `
+        <iframe 
+            width="100%" 
+            height="100%" 
+            src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+        </iframe>
+    `;
+};
+
+// 🏨 FUNCIONES DE RESERVA
+window.consultarDisponibilidad = function() {
+    const mensaje = encodeURIComponent('Hola, me gustaría consultar disponibilidad para la habitación vista mar en Hostal Capurgana.');
+    const url = `https://wa.me/${CONFIG.whatsappNumber.replace('+', '')}?text=${mensaje}`;
+    window.open(url, '_blank');
+};
+
+window.reservarDirecto = function() {
+    const mensaje = encodeURIComponent('¡Hola! Quiero hacer una reserva DIRECTA para la habitación vista mar en Hostal Capurgana. ¿Cuál es el proceso?');
+    const url = `https://wa.me/${CONFIG.whatsappNumber.replace('+', '')}?text=${mensaje}`;
+    window.open(url, '_blank');
+};
+
+// 🌟 ABRIR LUGARES SIMILARES
+window.abrirLugar = function(url) {
+    window.open(url, '_blank');
+};
+
+// 📱 SCROLL TO REVIEWS
+window.scrollToReviews = function() {
+    document.getElementById('reviewsSection').scrollIntoView({ 
+        behavior: 'smooth' 
+    });
+};
+
+console.log(`
+🔥 ================================ 🔥
+   HOSTAL CAPURGANA SISTEMA NETZERD
+🔥 ================================ 🔥
+
+✅ Sistema Netzerd inicializado
+🔥 Base de datos en tiempo real
+⚡ Sincronización global
+📱 Responsive design
+🎯 Cupones de validación
+⭐ Sistema de ratings
+💬 Reseñas en tiempo real
+📞 Contacto directo WhatsApp
+✨ Servicios incluidos compactos
+
+🔥 ================================ 🔥
+`);
+
+</script>
+
+</body>
+</html>

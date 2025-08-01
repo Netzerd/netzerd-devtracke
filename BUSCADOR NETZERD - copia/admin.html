@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Netzerd</title>
+    <link rel="stylesheet" href="admin-styles.css">
+</head>
+<body>
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <h1>🏨 Panel de Administración</h1>
+                <p>Ingresa tus credenciales para acceder</p>
+            </div>
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label>📧 Correo Electrónico</label>
+                    <input type="email" id="admin-email" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label>🔐 Contraseña</label>
+                    <input type="password" id="admin-password" class="form-input" required>
+                </div>
+                <button type="submit" class="btn-primary">Iniciar Sesión</button>
+                <div id="login-error" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div id="admin-panel" class="admin-panel" style="display: none;">
+        <header class="admin-header">
+            <div class="header-content">
+                <h1>🏨 Panel de Administración - Netzerd</h1>
+                <div class="header-actions">
+                    <span class="admin-user" id="admin-user"></span>
+                    <button id="logout-btn" class="btn-logout">Cerrar Sesión</button>
+                </div>
+            </div>
+        </header>
+
+        <nav class="admin-nav">
+            <button class="nav-btn active" onclick="mostrarSeccion('hoteles')" data-section="hoteles">🏨 Hoteles</button>
+            <button class="nav-btn" onclick="mostrarSeccion('micrositios')" data-section="micrositios">🌐 Micrositios</button>
+            <button class="nav-btn" onclick="mostrarSeccion('stats')" data-section="stats">📊 Estadísticas</button>
+        </nav>
+
+        <main class="admin-content">
+            <!-- SECCIÓN HOTELES -->
+            <section id="hoteles" class="content-section active">
+                <div class="section-header">
+                    <h2>Gestión de Hoteles</h2>
+                    <button onclick="abrirFormularioHotel()" class="btn-primary">➕ Crear Hotel</button>
+                </div>
+                <div id="lista-hoteles" class="micrositios-grid"></div>
+            </section>
+
+            <!-- SECCIÓN MICROSITIOS -->
+            <section id="micrositios" class="content-section">
+                <div class="section-header">
+                    <h2>🌐 Gestión de Micrositios</h2>
+                    <button onclick="crearMicrositio()" class="btn-primary">+ Crear Micrositio</button>
+                </div>
+                <div id="lista-micrositios" class="micrositios-grid"></div>
+            </section>
+
+            <!-- SECCIÓN ESTADÍSTICAS -->
+            <section id="stats" class="content-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🏨</div>
+                        <div class="stat-content">
+                            <h3 id="total-hotels">0</h3>
+                            <p>Total de Hoteles</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🌐</div>
+                        <div class="stat-content">
+                            <h3 id="total-micrositios">0</h3>
+                            <p>Micrositios Creados</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL HOTEL -->
+    <div id="modal-hotel" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="titulo-modal-hotel">🏨 Crear Hotel</h2>
+                <button onclick="cerrarModalHotel()" class="modal-close">&times;</button>
+            </div>
+            <form id="form-hotel" class="hotel-form">
+                <div class="form-section">
+                    <h4>📋 Información Básica</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>🏨 Nombre del Hotel *</label>
+                            <input type="text" id="hotel-nombre" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label>🔗 Slug/URL *</label>
+                            <input type="text" id="hotel-slug" class="form-input" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>📍 Ciudad *</label>
+                            <input type="text" id="hotel-ciudad" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label>🗺️ Departamento *</label>
+                            <input type="text" id="hotel-departamento" class="form-input" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>📝 Descripción *</label>
+                        <textarea id="hotel-descripcion" class="form-input" rows="3" required></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4>📸 Imagen Principal</h4>
+                    <div class="form-group">
+                        <label>🖼️ URL de la Imagen *</label>
+                        <input type="url" id="hotel-imagen" class="form-input" required>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4>💰 Precios</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>💲 Precio por Noche (COP)</label>
+                            <input type="number" id="hotel-precio-noche" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label>🏷️ Rango de Precio</label>
+                            <select id="hotel-precio" class="form-input">
+                                <option value="$">$ (Económico)</option>
+                                <option value="$$">$$ (Moderado)</option>
+                                <option value="$$$">$$$ (Premium)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4>⚙️ Configuraciones</h4>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hotel-netzerd" checked>
+                        🔥 Sistema Netzerd
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hotel-activo" checked>
+                        🌐 Hotel Activo
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" onclick="cerrarModalHotel()" class="btn-secondary">Cancelar</button>
+                    <button type="submit" class="btn-primary">💾 Guardar Hotel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL MICROSITIO -->
+    <div id="modal-micrositio" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="titulo-modal-micrositio">🌐 Crear Micrositio</h2>
+                <button onclick="cerrarModalMicrositio()" class="modal-close">&times;</button>
+            </div>
+            <form id="form-micrositio" class="hotel-form">
+                <div class="form-section">
+                    <h4>🏨 Hotel Vinculado</h4>
+                    <div class="form-group">
+                        <label>Seleccionar Hotel *</label>
+                        <select id="micro-hotel-id" class="form-input" required>
+                            <option value="">-- Selecciona un hotel --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4>📋 Información del Micrositio</h4>
+                    <div class="form-group">
+                        <label>🏨 Título del Micrositio *</label>
+                        <input type="text" id="micro-titulo" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>📝 Descripción Extendida *</label>
+                        <textarea id="micro-descripcion" class="form-input" rows="4" required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>📱 WhatsApp *</label>
+                            <input type="text" id="micro-whatsapp" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label>📧 Email</label>
+                            <input type="email" id="micro-email" class="form-input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4>🛏️ Habitaciones</h4>
+                    <div id="habitaciones-container"></div>
+                    <button type="button" onclick="agregarHabitacion()" class="btn-secondary">+ Agregar Habitación</button>
+                </div>
+
+                <div class="form-section">
+                    <h4>✨ Servicios</h4>
+                    <div class="servicios-grid">
+                        <label class="servicio-item">
+                            <input type="checkbox" value="WiFi Gratis"> 📶 WiFi Gratis
+                        </label>
+                        <label class="servicio-item">
+                            <input type="checkbox" value="Desayuno"> 🍳 Desayuno
+                        </label>
+                        <label class="servicio-item">
+                            <input type="checkbox" value="Aire Acondicionado"> ❄️ Aire Acondicionado
+                        </label>
+                        <label class="servicio-item">
+                            <input type="checkbox" value="Parqueadero"> 🚗 Parqueadero
+                        </label>
+                        <label class="servicio-item">
+                            <input type="checkbox" value="Piscina"> 🏊 Piscina
+                        </label>
+                        <label class="servicio-item">
+                            <input type="checkbox" value="Restaurante"> 🍽️ Restaurante
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" onclick="cerrarModalMicrositio()" class="btn-secondary">Cancelar</button>
+                    <button type="button" onclick="previsualizarMicrositio()" class="btn-primary">👁️ Previsualizar</button>
+                    <button type="submit" class="btn-primary">💾 Guardar Micrositio</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL PREVIEW -->
+    <div id="modal-preview" class="modal">
+        <div class="modal-content" style="max-width: 90%; width: 1000px;">
+            <div class="modal-header">
+                <h3>👁️ Vista Previa del Micrositio</h3>
+                <button onclick="cerrarPreview()" class="modal-close">&times;</button>
+            </div>
+            <div style="padding: 20px;">
+                <iframe id="preview-frame" style="width: 100%; height: 600px; border: 1px solid #ddd;"></iframe>
+            </div>
+            <div class="form-actions">
+                <button onclick="cerrarPreview()" class="btn-secondary">Cerrar</button>
+                <button onclick="descargarMicrositio()" class="btn-primary">📥 Descargar HTML</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
